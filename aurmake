@@ -1,0 +1,69 @@
+#!/bin/bash
+
+function usage {
+	echo -e $"\
+AurMake -- simple AUR helper.
+Usage: $0 PKG_NAME [OPTS]; fetches from AUR and builds package; options:\n\
+	-h	print this help\n\
+	-k	keep sources\n\
+	-d	skip depency checks\n\
+GNU GPL'ed by Mateusz Machalica 2011\
+"
+	exit 0
+}
+
+function status {
+	echo "$(tput bold)$(tput setaf 5)==> $(tput sgr0)$(tput bold)${1}$(tput sgr0)"
+}
+
+function fail {
+	echo "$(tput bold)$(tput setaf 2)==> $(tput sgr0)$(tput bold)${1}$(tput sgr0)"
+	exit 1
+}
+
+BORN_CWD=$(pwd)
+AUR_DIR="http://aur.archlinux.org/packages/"
+PKG_EXT="pkg.tar.xz"
+
+if [[ "$#" -lt 1 ]]; then
+	usage
+fi
+
+PKG_NAME="$1"
+PKG_SRC="$PKG_NAME.tar.gz"
+shift
+
+Oclean=true
+Odeps=false
+while getopts ":hkd" opt; do
+	case $opt in
+		h)	usage ;;
+		k)	Oclean=false ;;
+		d)	Odeps=true ;;
+		\?)	fail "Invalid option: -$OPTARG" ;;
+	esac
+done
+
+MAKE_OPTS="-f"
+$Oclean	&& MAKE_OPTS="$MAKE_OPTS -c"
+$Odeps	|| MAKE_OPTS="$MAKE_OPTS -d"
+
+WGET_OPTS="--no-clobber"
+
+status "Fetching PKGBUILD and tarball."
+wget $WGET_OPTS "${AUR_DIR}${PKG_NAME:0:2}/${PKG_NAME}/${PKG_SRC}" || exit 1
+status "Entering build directory."
+tar xzf $PKG_SRC || exit 1
+cd $PKG_NAME || exit 1
+
+status "Making package."
+makepkg $MAKE_OPTS || exit 1
+
+status "Package successfully build."
+mv $PKG_NAME-*.$PKG_EXT ../
+cd $BORN_CWD
+
+status "Cleaning."
+rm -rf $PKG_NAME
+rm -rf $PKG_SRC
+

@@ -1,0 +1,9 @@
+PACKAGES=(
+  repo1
+  repo2
+  repo3
+)
+REPO_PATH=/path/to/your/repo
+REPO_DB=repo-name.db.tar.gz
+
+# vim: set filetype=sh:
