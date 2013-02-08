@@ -3,22 +3,22 @@
 DEFAULT_CONF=~/.aurrepo
 
 function usage {
-	echo -e $"\
-AurUpdate -- simple AUR repo updater.
-Usage: $(basename $0) CONF_FILE; updates repo described in CONF_FILE,\n\
-	if no specified uses $DEFAULT_CONF;\n\
-GNU GPL'ed by Mateusz Machalica 2012\
-"
-	exit 0
+  echo -e $"\
+    AurUpdate -- simple AUR repo updater.
+  Usage: $(basename $0) CONF_FILE; updates repo described in CONF_FILE,\n\
+    if no specified uses $DEFAULT_CONF;\n\
+      GNU GPL'ed by Mateusz Machalica 2012\
+      "
+  exit 0
 }
 
 function status {
-	echo "$(tput bold)$(tput setaf 5)==> $(tput sgr0)$(tput bold)${1}$(tput sgr0)"
+  echo "$(tput bold)$(tput setaf 5)==> $(tput sgr0)$(tput bold)${1}$(tput sgr0)"
 }
 
 function fail {
-	echo "$(tput bold)$(tput setaf 2)==> $(tput sgr0)$(tput bold)${1}$(tput sgr0)"
-	exit 1
+  echo "$(tput bold)$(tput setaf 2)==> $(tput sgr0)$(tput bold)${1}$(tput sgr0)"
+  exit 1
 }
 
 function check_update {
@@ -30,21 +30,24 @@ function check_update {
   Installed=$(pacman -Q "$1" 2> /dev/null | cut -d ' ' -f 2)
 
   case $Ver-$Rel in
-    "latest-$Rel") return 0;;
-    "$Installed") return 1;;
+    "$Installed")
+      return 1
+      ;;
+    *)
+      return 0
+      ;;
   esac
-  return 0
 }
 
 BORN_CWD=$(pwd)
 
 if [[ "$#" -eq 1 ]]; then
-	source "$1"
-	shift
+  source "$1"
+  shift
 elif [[ "$#" -eq 0 ]]; then
-	source $DEFAULT_CONF
+  source $DEFAULT_CONF
 else
-	usage
+  usage
 fi
 
 [[ -d "$REPO_PATH" ]] || fail "No such directory."
@@ -58,7 +61,7 @@ rm -f "$REPO_DB"
 rm -f *.pkg.*
 
 for pkg in "${PACKAGES[@]}"; do
-	if check_update "$pkg"; then
+  if check_update "$pkg"; then
     status "Package $pkg needs update." 
     aurmake "$pkg"
   else
@@ -66,7 +69,9 @@ for pkg in "${PACKAGES[@]}"; do
   fi
 done
 
-repo-add "$REPO_DB" *.pkg.*
+touch "$REPO_DB"
+ln -s "$REPO_DB" "${REPO_DB/.tar*/}"
+repo-add "$REPO_DB" *.pkg.* 2> /dev/null
 
 cd $BORN_CWD
 
