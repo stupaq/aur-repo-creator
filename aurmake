@@ -1,24 +1,24 @@
 #!/bin/bash
 
 function usage {
-	echo -e $"\
-AurMake -- simple AUR helper.
-Usage: $0 PKG_NAME [OPTS]; fetches from AUR and builds package; options:\n\
-	-h	print this help\n\
-	-k	keep sources\n\
-	-d	skip depency checks\n\
-GNU GPL'ed by Mateusz Machalica 2011\
-"
-	exit 0
+  echo -e $"\
+    AurMake -- simple AUR helper.
+  Usage: $0 PKG_NAME [OPTS]; fetches from AUR and builds package; options:\n\
+    -h	print this help\n\
+    -k	keep sources\n\
+    -d	skip depency checks\n\
+    GNU GPL'ed by Mateusz Machalica 2011\
+    "
+  exit 0
 }
 
 function status {
-	echo "$(tput bold)$(tput setaf 5)==> $(tput sgr0)$(tput bold)${1}$(tput sgr0)"
+  echo "$(tput bold)$(tput setaf 5)==> $(tput sgr0)$(tput bold)${1}$(tput sgr0)"
 }
 
 function fail {
-	echo "$(tput bold)$(tput setaf 2)==> $(tput sgr0)$(tput bold)${1}$(tput sgr0)"
-	exit 1
+  echo "$(tput bold)$(tput setaf 2)==> $(tput sgr0)$(tput bold)${1}$(tput sgr0)"
+  exit 1
 }
 
 BORN_CWD=$(pwd)
@@ -26,7 +26,7 @@ AUR_DIR="http://aur.archlinux.org/packages/"
 PKG_EXT="pkg.tar.xz"
 
 if [[ "$#" -lt 1 ]]; then
-	usage
+  usage
 fi
 
 PKG_NAME="$1"
@@ -36,12 +36,12 @@ shift
 Oclean=true
 Odeps=false
 while getopts ":hkd" opt; do
-	case $opt in
-		h)	usage ;;
-		k)	Oclean=false ;;
-		d)	Odeps=true ;;
-		\?)	fail "Invalid option: -$OPTARG" ;;
-	esac
+  case $opt in
+    h) usage ;;
+    k) Oclean=false ;;
+    d) Odeps=true ;;
+    \?) fail "Invalid option: -$OPTARG" ;;
+  esac
 done
 
 MAKE_OPTS="-f"
