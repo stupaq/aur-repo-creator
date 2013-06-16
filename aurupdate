@@ -70,7 +70,7 @@ for pkg in "${PACKAGES[@]}"; do
 done
 
 touch "$REPO_DB"
-ln -s "$REPO_DB" "${REPO_DB/.tar*/}"
+ln -f -s "$REPO_DB" "${REPO_DB/.tar*/}"
 repo-add "$REPO_DB" *.pkg.* 2> /dev/null
 
 cd $BORN_CWD
